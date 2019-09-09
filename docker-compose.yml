@@ -1,0 +1,39 @@
+version: '3.4'
+ 
+services:
+    database:
+        image: mysql:5.7
+        ports:
+          - "3306:3306"
+        environment:
+          MYSQL_DATABASE: api
+          MYSQL_USER: foobar
+          MYSQL_PASSWORD: foobar
+          MYSQL_ROOT_PASSWORD: foobar
+        volumes:
+          - db-data:/var/lib/mysql
+        networks:
+            - ournet
+    
+    api:
+        build:
+            context: .
+            dockerfile: Dockerfile.api
+        environment:
+          SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/api?useSSL=false
+          SPRING_DATASOURCE_USERNAME: foobar
+          SPRING_DATASOURCE_PASSWORD: foobar
+        depends_on:
+            - "database"
+        ports:
+            - 8080:8080
+        networks:
+            - ournet
+
+networks:
+  ournet:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local  # is already local by default
